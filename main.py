@@ -38,12 +38,6 @@ def main():
         lines = file.readlines()
         file.close()
 
-##        lines2 = []
-##        for line in lines:
-##            #print("Line \""+line+"\"")
-##            if line.endswith("\n"): lines2.append(line[:-1])
-##            else:                   lines2.append(line     )
-
         output = ""
         for rule in rules:
             try:
