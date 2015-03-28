@@ -4,12 +4,16 @@ import traceback
 import files
 
 #List of rules to use
+import rules.final_newline
 import rules.leading_space
 import rules.trailing_whitespace
+import rules.unnecessary_qualification
 rules = [
     #Comment out any here that you don't want.
+    rules.final_newline.RuleFinalNewline,
     rules.leading_space.RuleLeadingSpace,
-    rules.trailing_whitespace.RuleTrailingWhitespace
+    rules.trailing_whitespace.RuleTrailingWhitespace,
+    rules.unnecessary_qualification.RuleUnnecessaryQualification
 ]
 
 #Configuration
@@ -34,20 +38,26 @@ def main():
         lines = file.readlines()
         file.close()
 
-        lines2 = []
-        for line in lines:
-            if line.endswith("\n"): lines2.append(line[:-1])
-            else:                   lines2.append(line     )
+##        lines2 = []
+##        for line in lines:
+##            #print("Line \""+line+"\"")
+##            if line.endswith("\n"): lines2.append(line[:-1])
+##            else:                   lines2.append(line     )
 
         output = ""
         for rule in rules:
-            occurred = rule.rule(lines2)
+            try:
+                occurred = rule.rule(path,lines)
+            except:
+                print("Error occurred while applying rule \"%s\" to \"%s\":" % (rule.NAME,path))
+                traceback.print_exc()
+                occurred = []
             if len(occurred) > 0:
-                output += TERMINAL_INDENT+rule.get_description(filename,occurred)+"\n"
+                output += TERMINAL_INDENT+rule.get_description(occurred)+"\n"
 
                 num_output_lines = 0
                 last_line_number = -1
-                for line_number in range(1,len(lines2)+1,1):
+                for line_number in range(1,len(lines)+1,1):
                     if line_number in occurred:
                         if num_output_lines >= MAX_OUTPUT_PER_FILE-1:
                             output += TERMINAL_INDENT+TERMINAL_INDENT+"[more occurrence(s) follow]\n"
@@ -56,7 +66,9 @@ def main():
                             output += TERMINAL_INDENT+TERMINAL_INDENT+"...\n"
                             num_output_lines += 1
 
-                        out_ln = TERMINAL_INDENT+TERMINAL_INDENT+"%d: \"%s\"\n" % (line_number,lines2[line_number-1])
+                        out_ln = TERMINAL_INDENT+TERMINAL_INDENT+str(line_number)+": \""+lines[line_number-1]
+                        if out_ln.endswith("\n"): out_ln=out_ln[:-1]
+                        out_ln += "\"\n"
                         out_ln = out_ln.replace("\t",TERMINAL_INDENT)
                         if len(out_ln)>TERMINAL_WIDTH-1: out_ln=out_ln[:TERMINAL_WIDTH-5]+"...\"\n"
                         output += out_ln

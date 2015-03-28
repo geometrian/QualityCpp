@@ -22,7 +22,7 @@ _excludes_suff = [
     "blend","blend1","obj","mtl","stl",
     "bmp","jpg","pfm","png","ppm","tga",
     "hdr","f32","f32z",
-    "py",
+    "py","pyc",
     "lnk",
     #"lua",
     "opensdf","sdf","suo",
@@ -36,6 +36,8 @@ _excludes_suff = [
 ]
 
 def _get_file_list(path):
+    if path=="": return []
+
     result = []
     for name in os.listdir(path):
         found = False
