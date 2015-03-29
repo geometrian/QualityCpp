@@ -4,11 +4,31 @@ import re
 
 #Any unnecessarily qualified object instance is marked.  See
 #   http://stackoverflow.com/questions/29293136/compiler-warning-for-unnecessary-namespaces
-
-
-###Note excluding system headers
-##include_regex = re.compile("^\s*#\s*include\s*\"[^\"]+\"")
-
+#   This is based on an extremely simple lexical analysis/preprocessing.  The following
+#   limitations apply:
+#       Makes no attempt to parse "#include"s or "#define"s.  As such, this does not catch
+#           any issues related to macroed namespaces (and indeed, it may report false positives
+#           for such).
+#       Searches in all preprocessor branches (in a sane way, so e.g. this code, which has
+#           mismatched braces lexically, won't screw it up):
+#               #if 1
+#                   namespace Foo {
+#               #else
+#                   namespace FooBar {
+#               #endif
+#                       /*...*/
+#                   }
+#       Does not search in comments.  TODO: maybe should?
+#       Completely ignores using namespace declarations
+#       If a type has the same name as its enclosing namespace, then it will be reported as
+#           a false positive.  E.g.:
+#               namespace Foo {
+#                   class Foo { void f(void); };
+#                   void Foo::f(void) {} //false positive!
+#               }
+#       If there are two identifiers with the same name but one in an enclosed namespace, then
+#           this rule is not smart enough to tell that the qualification is necessary when
+#           invoking the identifier in the enclosing namespace from within enclosed namespace.
 
 def _strip_comments(lines):
     lines2 = []
@@ -40,21 +60,6 @@ def _strip_comments(lines):
         lines2.append(line2)
     return lines2
 
-#Based on an extremely simple lexical analysis/preprocessing.  Makes no attempt to parse
-#   "#include"s or "#define"s.  As such, this does not catch any issues related to
-#   macroed namespaces (and indeed, it may report false positives for such).  Searches
-#   in all preprocessor branches (in a sane way, so e.g. this code, which has mismatched
-#   braces lexically, won't screw it up):
-#       #if 1
-#           namespace Foo {
-#       #else
-#           namespace FooBar {
-#       #endif
-#               /*...*/
-#           }
-#   Does not search in comments.  TODO: maybe should?  It also definitely doesn't work
-#   well (if at all) with using declarations
-
 class RuleUnnecessaryQualification(object):
     NAME = "Unnecessary Qualification"
     
@@ -75,28 +80,6 @@ class RuleUnnecessaryQualification(object):
             path.endswith(".cxx")\
         ): return [] #Can only operate on C/C++ files
 
-##        #Evaluate preprocessor
-##        reached = []
-##        def preprocess(dir,lines):
-##            lines2 = []
-##            for line_number,line in lines:
-##                if include_regex.match(line) != None:
-##                    include = line.split("\"")[1]
-##                    path2 = os.path.normpath(os.path.join(dir,include))
-##                    if path2 in reached: continue
-##                    reached.append(path2)
-##                    #raw_input("Including \"%s\"" % (include))
-##
-##                    file = open(path2,"r")
-##                    include_file = file.readlines()
-##                    file.close()
-##
-##                    lines2 += preprocess(os.path.dirname(path2),zip( [None]*len(include_file), include_file ))
-##                lines2.append((line_number,line))
-##            return lines2
-##        lines2 = preprocess(os.path.dirname(path),zip( range(1,len(lines)+1,1), lines ))
-##        #raw_input(lines2)
-
         #Remove comments
         lines2 = _strip_comments(lines)
 
@@ -106,6 +89,7 @@ class RuleUnnecessaryQualification(object):
         regex = re.compile(
             "(::)|"+          #scope
             "(\\s+)|"+        #whitespace
+            "(\".+\")|"+      #string
             "(\\{)|"+         #open brace
             "(\\})|"+         #close brace
             "([a-zA-Z]+\\w*)" #identifier
@@ -141,8 +125,8 @@ class RuleUnnecessaryQualification(object):
                     for element in section:
                         if type(element) == type(()):
                             for match in re.finditer(regex,element[1]):
-                                scope, whitespace, openbrace, closebrace, iden = match.groups()
-                                #raw_input((scope, whitespace, iden))
+                                scope, whitespace, string, openbrace, closebrace, iden = match.groups()
+##                                raw_input((scope, whitespace, iden))
                                 if        scope!=None: section_tokens.append((element[0],     scope))
                                 elif  openbrace!=None: section_tokens.append((element[0], openbrace))
                                 elif closebrace!=None: section_tokens.append((element[0],closebrace))
@@ -208,12 +192,15 @@ class RuleUnnecessaryQualification(object):
                 else:
                     line_number,token = element
                     if token == "namespace": #[namespace] [name] [{]
-                        assert i+2 < len(tokens) and type(tokens[i+1])==type(()) and type(tokens[i+2])==type(())
-                        namespace = tokens[i+1][1]
-                        #Skip brace
-                        namespace_stack.append(namespace+"{")
-##                        print_stacks()
-                        i += 3
+                        if i>=1 and type(tokens[i-1])==type(()) and tokens[i-1][1]=="using": #Not supported
+                            i += 1
+                        else:
+                            assert i+2 < len(tokens) and type(tokens[i+1])==type(()) and type(tokens[i+2])==type(())
+                            namespace = tokens[i+1][1]
+                            #Skip brace
+                            namespace_stack.append(namespace+"{")
+##                            print_stacks()
+                            i += 3
                     elif token == "{": #block
                         namespace_stack.append(token)
 ##                        print_stacks()
@@ -223,6 +210,8 @@ class RuleUnnecessaryQualification(object):
 ##                        print_stacks()
                         i += 1
                     else: #an identifier or keyword
+                        preceding = None
+                        if i>=2 and type(tokens[i-2])==type(()): preceding=tokens[i-2][1]
                         T = [token]
                         while i+1<len(tokens) and type(tokens[i+1])==type(()) and tokens[i+1][1]=="::":
                             T.append(tokens[i+2][1])
@@ -239,8 +228,10 @@ class RuleUnnecessaryQualification(object):
                             else:
                                 for substack in elem0:
                                     check(substack,T)
-                        if len(unfinished_stacks)>0: check(namespace_stack+[unfinished_stacks],T)
-                        else:                        check(namespace_stack,T)
+                        if len(T) > 1: #Must have at least one qualification
+                            if preceding==None or preceding!="friend": #Don't check "friend class [iden]", since this needs to be qualified if we're inside a deeper namespace
+                                if len(unfinished_stacks)>0: check(namespace_stack+[unfinished_stacks],T)
+                                else:                        check(namespace_stack,T)
                         i += 1
             if len(unfinished_stacks)>0: namespace_stack.append(unfinished_stacks)
 ##            print_stacks(False)
@@ -248,23 +239,5 @@ class RuleUnnecessaryQualification(object):
                 return list(namespace_stack[len(stack_base):])
             return []
         flatten([], tokens, 0)
-
-##        tokens = []
-##        for token in lexer.ppTokens(minWs=True):
-##            if token.lineNum==0: continue #Whitespace, apparently.
-##            tokens.append((token.lineNum,token.t))
-
-##        #If there's a stack underflow here, it probably means your code has mismatched braces.  Check it with
-##        #   a real compiler.
-##        stack = []
-##        i = 0
-##        while True:
-##            if i==len(tokens): break
-##            line_number,token = tokens[i]
-##            if   token == "namespace": #[namespace] [name] [{]
-##                namespace = tokens[i+1][1]
-##                stack.append(namespace+"{")
-##                i += 3
-
 
         return result
