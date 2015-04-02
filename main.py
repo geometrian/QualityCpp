@@ -5,12 +5,14 @@ import files
 
 #List of rules to use
 import rules.final_newline
+import rules.numof
 import rules.leading_space
 import rules.trailing_whitespace
 import rules.unnecessary_qualification
 rules = [
     #Comment out any here that you don't want.
     rules.final_newline.RuleFinalNewline,
+    rules.numof.RuleNumOf,
     rules.leading_space.RuleLeadingSpace,
     rules.trailing_whitespace.RuleTrailingWhitespace,
     rules.unnecessary_qualification.RuleUnnecessaryQualification
@@ -47,6 +49,8 @@ def main():
                 traceback.print_exc()
                 occurred = []
             if len(occurred) > 0:
+                len_largest_line_number = len(str(occurred[-1]))
+                
                 output += TERMINAL_INDENT+rule.get_description(occurred)+"\n"
 
                 num_output_lines = 0
@@ -60,7 +64,9 @@ def main():
                             output += TERMINAL_INDENT+TERMINAL_INDENT+"...\n"
                             num_output_lines += 1
 
-                        out_ln = TERMINAL_INDENT+TERMINAL_INDENT+str(line_number)+": \""+lines[line_number-1]
+                        out_ln = TERMINAL_INDENT+TERMINAL_INDENT+\
+                            (len_largest_line_number-len(str(line_number)))*" " + str(line_number)+\
+                            ": \""+lines[line_number-1]
                         if out_ln.endswith("\n"): out_ln=out_ln[:-1]
                         out_ln += "\"\n"
                         out_ln = out_ln.replace("\t",TERMINAL_INDENT)
@@ -73,6 +79,7 @@ def main():
             print("\""+path+"\":")
             print(output[:-1])
             if PAUSE_FILE: input(TERMINAL_INDENT+"Press ENTER to continue.")
+    print("All files (%d) processed!"%len(paths))
     if PAUSE_COMPLETE: input("Press ENTER to quit.")
 
 if __name__ == "__main__":
