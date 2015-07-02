@@ -1,10 +1,12 @@
 import os
+import sys
 import traceback
 
 import files
 
 #List of rules to use
 import rules.final_newline
+import rules.final_virtual
 import rules.numof
 import rules.leading_space
 import rules.trailing_whitespace
@@ -12,6 +14,7 @@ import rules.unnecessary_qualification
 rules = [
     #Comment out any here that you don't want.
     rules.final_newline.RuleFinalNewline,
+    rules.final_virtual.RuleFinalVirtual,
     rules.numof.RuleNumOf,
     rules.leading_space.RuleLeadingSpace,
     rules.trailing_whitespace.RuleTrailingWhitespace,
@@ -22,8 +25,8 @@ rules = [
 TERMINAL_INDENT = "  "
 TERMINAL_WIDTH = 80
 MAX_OUTPUT_PER_FILE = 20
-PAUSE_FILE = True
-PAUSE_COMPLETE = True
+PAUSE_ON_FILEWARNING = True
+PAUSE_ON_COMPLETE = True
 
 
 try: input=raw_input
@@ -33,6 +36,7 @@ except: pass
 def main():
     paths = files.choose_files()
 
+    path_index = 0
     for path in paths:
         filename = os.path.basename(path)
 
@@ -40,14 +44,23 @@ def main():
         lines = file.readlines()
         file.close()
 
+        msg = "Processing file "+str(path_index+1)+" of "+str(len(paths))+": \""
+        if len(msg)+len(path)+1<TERMINAL_WIDTH:
+            msg += path+"\""
+            msg += " "*(TERMINAL_WIDTH-len(msg)-1)
+        else:
+            msg += path[:TERMINAL_WIDTH-len(msg)-5] + "\"..."
+        sys.stdout.write("\r"+msg); sys.stdout.flush()
+
         output = ""
         for rule in rules:
             try:
                 occurred = rule.rule(path,lines)
             except:
+                sys.stdout.write("\n")
                 print("Error occurred while applying rule \"%s\" to \"%s\":" % (rule.NAME,path))
                 traceback.print_exc()
-                occurred = []
+                input()
             if len(occurred) > 0:
                 len_largest_line_number = len(str(occurred[-1]))
                 
@@ -76,11 +89,14 @@ def main():
                         num_output_lines += 1
                         last_line_number = line_number
         if len(output) > 0:
+            sys.stdout.write("\r"+" "*(TERMINAL_WIDTH-1)+"\r");
             print("\""+path+"\":")
             print(output[:-1])
-            if PAUSE_FILE: input(TERMINAL_INDENT+"Press ENTER to continue.")
+            if PAUSE_ON_FILEWARNING: input(TERMINAL_INDENT+"Press ENTER to continue.")
+        path_index += 1
+    sys.stdout.write("\r"+" "*(TERMINAL_WIDTH-1)+"\r");
     print("All files (%d) processed!"%len(paths))
-    if PAUSE_COMPLETE: input("Press ENTER to quit.")
+    if PAUSE_ON_COMPLETE: input("Press ENTER to quit.")
 
 if __name__ == "__main__":
     try:

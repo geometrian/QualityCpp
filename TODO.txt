@@ -1,0 +1,8 @@
+Enforce rule of three
+
+virtual inline -> inline virtual
+inline explicit -> explicit inline
+
+check for empty constructors/destructors to be made default
+
+check for one-argument constructors to be explicit

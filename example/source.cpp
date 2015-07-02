@@ -19,7 +19,7 @@ namespace Foo { namespace Bar { namespace Baz {
 #if 1
 	#if 1
 		namespace A {
-			class MyType0 {};
+			class MyType0 { int my_type0; }; //Test no final
 			A::MyType0 overqualified0;
 	#else
 		namespace B {
@@ -32,13 +32,26 @@ namespace Foo { namespace Bar { namespace Baz {
 #endif
 
 
-class MyType {};
+//Test no final
+class Okay1 final { //okay
+	~Okay1(void) = default;
+};
+class Okay2 { //okay
+	virtual ~Okay2(void) = default;
+};
+class Bad1 final { //bad; shouldn't have both final and virtual
+	virtual ~Bad1(void) = default;
+};
+class Bad2 { //bad; shouldn't have neither final nor virtual
+	~Bad2(void) = default;
+};
 
-MyType not_overqualified
 
-Baz::MyType overqualified2;
-Bar::Baz::MyType overqualified3;
-Foo::Bar::Baz::MyType overqualified4;
+//Test overqualification
+Okay1 not_overqualified;
+Baz::Okay1 overqualified2;
+Bar::Baz::Okay1 overqualified3;
+Foo::Bar::Baz::Okay1 overqualified4;
 
 
 }}}

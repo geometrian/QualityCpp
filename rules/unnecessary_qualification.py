@@ -2,6 +2,9 @@ import io
 import os
 import re
 
+import _is_c_like
+import _strip_comments
+
 #Any unnecessarily qualified object instance is marked.  See
 #   http://stackoverflow.com/questions/29293136/compiler-warning-for-unnecessary-namespaces
 #   This is based on an extremely simple lexical analysis/preprocessing.  The following
@@ -29,59 +32,25 @@ import re
 #       If there are two identifiers with the same name but one in an enclosed namespace, then
 #           this rule is not smart enough to tell that the qualification is necessary when
 #           invoking the identifier in the enclosing namespace from within enclosed namespace.
+#TODO: rewrite to use parser as in "final_virtual.py".
 
-def _strip_comments(lines):
-    lines2 = []
-    comment_mode = False
-
-    for i in range(len(lines)):
-        line = lines[i]
-        line2 = ""
-        j = 0
-        while j < len(line):
-            if not comment_mode:
-                if line[j]=="/" and j+1<len(line) and (line[j+1]=="*" or line[j+1]=="/"):
-                    if line[j+1] == "/":
-                        line2 += "\n"
-                        break
-                    else: comment_mode=True
-                    j += 2
-                else:
-                    line2 += line[j]
-                    j += 1
-            else:
-                if line[j]=="*" and j+1<len(line) and line[j+1]=="/":
-                    comment_mode = False
-                    j += 2
-                else:
-                    if line[j] == "\n":
-                        line2 += "\n"
-                    j += 1
-        lines2.append(line2)
-    return lines2
 
 class RuleUnnecessaryQualification(object):
     NAME = "Unnecessary Qualification"
     
     @staticmethod
     def get_description(line_numbers):
-        result = "Unecessary qualification on line"
+        result = "Possible unecessary qualification on line"
         if len(line_numbers)>1: result+="s"
         return result
 
     @staticmethod
     def rule(path,lines):
-        if not (\
-            path.endswith(".h") or\
-            path.endswith(".hpp") or\
-            path.endswith(".c") or\
-            path.endswith(".cc") or\
-            path.endswith(".cpp") or\
-            path.endswith(".cxx")\
-        ): return [] #Can only operate on C/C++ files
+        if not _is_c_like.main(path): return [] #Can only operate on C/C++ files
 
         #Remove comments
-        lines2 = _strip_comments(lines)
+        temp = _strip_comments.main(lines)
+        lines2 = [line.real for line in temp]
 
         #Create a recursive stack of nested preprocessor conditionals and extract a recursive stack of
         #   C/C++ tokens.  For the regular expression sorcery used to do this, see this:
