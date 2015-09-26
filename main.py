@@ -5,20 +5,26 @@ import traceback
 import files
 
 #List of rules to use
+import rules.alphabetize_explicit_inline_static_virtual
+import rules.destructor_default
 import rules.final_newline
 import rules.final_virtual
 import rules.numof
 import rules.leading_space
 import rules.trailing_whitespace
 import rules.unnecessary_qualification
+import rules.virtual_override
 rules = [
     #Comment out any here that you don't want.
+    rules.alphabetize_explicit_inline_static_virtual.RuleAlphabetizeExplicitInlineStaticVirtual,
+    rules.destructor_default.RuleDestructorDefault,
     rules.final_newline.RuleFinalNewline,
     rules.final_virtual.RuleFinalVirtual,
     rules.numof.RuleNumOf,
     rules.leading_space.RuleLeadingSpace,
     rules.trailing_whitespace.RuleTrailingWhitespace,
-    rules.unnecessary_qualification.RuleUnnecessaryQualification
+    rules.unnecessary_qualification.RuleUnnecessaryQualification,
+    rules.virtual_override.RuleVirtualOverride
 ]
 
 #Configuration

@@ -17,10 +17,10 @@ class RuleFinalVirtual(object):
     
     @staticmethod
     def get_description(line_numbers):
-        result = "Possible class"
-        if len(line_numbers)>1: result+="es"
-        result += " with final/virtual mismatch begin definition on line"
-        if len(line_numbers)>1: result+="s"
+        if len(line_numbers) == 1:
+            result = "Possible class with final/virtual mismatch begins definition on line"
+        else:
+            result = "Possible classes with final/virtual mismatch begin definitions on lines"
         return result
 
     @staticmethod
