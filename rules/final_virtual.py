@@ -39,8 +39,8 @@ class RuleFinalVirtual(object):
 ##                print(elem)
 ##            raw_input()
 
-            #                (ws/start)    (type)    ws  (name) (ws final)? (ws : ws (access)? ws (parent))? ws* end
-            regex_defopen = "(\\A|\\s+)(class|struct)\\s+(\\w+)(\\s+final)?(\\s*:\\s*(\\w+)?\\s+([\\w:]+))?\\s*\\Z"
+            #                    (start/ws)       (type)    ws  (name) (ws final)? (ws : ws (access)? ws (parent))? ws* end
+            regex_defopen = "(\\A|(?<!enum)\\s+)(class|struct)\\s+(\\w+)(\\s+final)?(\\s*:\\s*(\\w+)?\\s+([\\w:]+))?\\s*\\Z"
 
             RuleFinalVirtual._index = 0
             indices = []
