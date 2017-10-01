@@ -39,8 +39,39 @@ class RuleFinalVirtual(object):
 ##                print(elem)
 ##            raw_input()
 
-            #                    (start/ws)       (type)    ws  (name) (ws final)? (ws : ws (access)? ws (parent))? ws* end
-            regex_defopen = "(\\A|(?<!enum)\\s+)(class|struct)\\s+(\\w+)(\\s+final)?(\\s*:\\s*(\\w+)?\\s+([\\w:]+))?\\s*\\Z"
+            #    (start/ws)
+            #    (type)
+            #    ws
+            #    (name)
+            #    [ws? tmpl]?
+            #    [ws? (final)]?
+            #    [
+            #        ws?
+            #        :
+            #        ws?
+            #        [(access) ws]?
+            #        (parent-name)
+            #        [ws? tmpl]?
+            #    ]?
+            #    ws?
+            #    end
+            regex_defopen =\
+                "(\\A|(?<!enum)\\s+)" +\
+                "(class|struct)" +\
+                "\\s+" +\
+                "([a-zA-Z_]+\\w*)" +\
+                "(?:\\s*\\<.*\\>)?" +\
+                "(?:\\s+(final))?" +\
+                "(?:" +\
+                    "\\s*" +\
+                    ":" +\
+                    "\\s*" +\
+                    "(?:((?:public|private|protected)(?:\\s+virtual)?)\\s+)" +\
+                    "([a-zA-Z_]+\\w*)" +\
+                    "(?:\\s*\\<.*\\>)?" +\
+                ")?" +\
+                "\\s*" +\
+                "\\Z"
 
             RuleFinalVirtual._index = 0
             indices = []
@@ -51,8 +82,8 @@ class RuleFinalVirtual(object):
 ##                        print(("block",block_i))
                         find1 = re.search(regex_defopen, block_i)
                         if find1:
-                            _,classname,name,ws_final,_,access,parent = find1.groups()
-                            has_final = ws_final is not None
+                            _,classname,name,maybe_final,maybe_access,maybe_parent = find1.groups()
+                            has_final = maybe_final is not None
 ##                            print(("FOUND",find.groups()))
 ##                            print(("FOUND!!!",classname,name,ws_final,access,parent))
 ##                            raw_input()
@@ -67,12 +98,12 @@ class RuleFinalVirtual(object):
                                 has_virt = False
 
                             bad = False
-                            if parent == None: #not a child, but may be a parent
+                            if maybe_parent == None: #not a child, but may be a parent
                                 #if a parent, then should have virtual but not have final.
                                 if has_virt and not has_final: pass
                                 #otherwise, should not have virtual and should have final.
                                 elif not has_virt and has_final: pass
-                                else: bad = True
+                                else: bad=True
                             else: #a child.  May be a parent
                                 if not has_virt: bad=True #Children should have virtual destructors
                                 #final may or may not be appropriate
@@ -99,7 +130,7 @@ class RuleFinalVirtual(object):
                     index = indices[0]
                     if length > index:
                         result.add(line.num)
-                        indices=indices[1:]
+                        indices = indices[1:]
                     else:
                         break
 ##            raw_input("Done:"+str(result))

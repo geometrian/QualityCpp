@@ -49,6 +49,12 @@ class Bad1 final { //bad; shouldn't have both final and virtual
 class Bad2 { //bad; shouldn't have neither final nor virtual
 	~Bad2(void) = default;
 };
+template <typename Channel, int bitsR> class Bad3 { public: Channel r:bitsR; }; //bad; template class shouldn't have neither final nor virtual
+template <> class Bad3<float16_t,16> { public: float16_t r; }; //bad; template class shouldn't have neither final nor virtual
+template <> class Bad3<    float,32> { public:     float r; }; //bad; template class shouldn't have neither final nor virtual
+template <typename Channel, int bitsR> class Bad4 : public virtual Parent<bitsR> { //bad; template class shouldn't have neither final nor virtual
+	public: Channel r:bitsR;
+};
 
 
 //Test overqualification
