@@ -12,7 +12,11 @@ static int c;
 static int d;
 
 
-namespace Foo { namespace Bar { namespace Baz {
+namespace Foo { namespace Bar {
+	namespace _Baz {
+		class ConfusingUnderline;
+	}
+namespace Baz {
 
 
 //Test stack-based preprocessor
@@ -49,6 +53,7 @@ class Bad2 { //bad; shouldn't have neither final nor virtual
 
 //Test overqualification
 Okay1 not_overqualified;
+_Baz::ConfusingUnderline not_overqualified2;
 Baz::Okay1 overqualified2;
 Bar::Baz::Okay1 overqualified3;
 Foo::Bar::Baz::Okay1 overqualified4;

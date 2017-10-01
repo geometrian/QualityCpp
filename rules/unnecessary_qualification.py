@@ -56,12 +56,12 @@ class RuleUnnecessaryQualification(object):
         #   C/C++ tokens.  For the regular expression sorcery used to do this, see this:
         #   #https://deplinenoise.wordpress.com/2012/01/04/python-tip-regex-based-tokenizer/
         regex = re.compile(
-            "(::)|"+          #scope
-            "(\\s+)|"+        #whitespace
-            "(\".+\")|"+      #string
-            "(\\{)|"+         #open brace
-            "(\\})|"+         #close brace
-            "([a-zA-Z]+\\w*)" #identifier
+            "(::)|"+           #scope
+            "(\\s+)|"+         #whitespace
+            "(\".+\")|"+       #string
+            "(\\{)|"+          #open brace
+            "(\\})|"+          #close brace
+            "([a-zA-Z_]+\\w*)" #identifier
         )
         class Stack(object):
             def __init__(self, lines,offset, level):
