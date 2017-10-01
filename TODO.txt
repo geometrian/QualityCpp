@@ -3,3 +3,5 @@ Enforce rule of three
 check for empty constructors to be made default
 
 check for one-argument constructors to be explicit
+
+check for `default`ed functions to be `inline`d, if not already
