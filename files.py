@@ -5,6 +5,7 @@ import wx
 
 #Any path containing any of these strings is ignored
 _excludes_cont = [
+    "3rdparty",
     ".git", ".build", ".ides",
     "dirent-1.13",
     "CocoaWindow",
@@ -25,7 +26,7 @@ _excludes_suff = [
     "py","pyc",
     "lnk",
     #"lua",
-    "opensdf","sdf","suo",
+    "db","opensdf","sdf","suo",
     "bin","dat","elf","img","out",
     "dvol","pmap","sogol",
     "ttf",
@@ -34,17 +35,23 @@ _excludes_suff = [
     "xml",
     "zip"
 ]
+#Excludes anything due to `_excludes_cont`, `_excludes_suff`, or a few patterns.
+def _exclude_fn(name):
+    for s in _excludes_cont:
+        if s in name: return True
+
+    ext = name.split(".")[-1]
+    if ext in _excludes_suff: return True
+    if ext.isdigit(): return True
+    
+    return False
 
 def _get_file_list(path):
     if path=="": return []
 
     result = []
     for name in os.listdir(path):
-        found = False
-        for s in _excludes_cont:
-            if name in s: found=True
-        if name.split(".")[-1] in _excludes_suff: found=True
-        if found: continue
+        if _exclude_fn(name): continue
 
         path2 = os.path.join(path,name)
 
