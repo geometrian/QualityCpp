@@ -1,4 +1,4 @@
-import _line
+import rules._line as _line
 
 
 def main(lines):

@@ -46,9 +46,14 @@ def main():
     for path in paths:
         filename = os.path.basename(path)
 
-        file = open(path,"r")
-        lines = file.readlines()
-        file.close()
+        try:
+            file = open(path,"r")
+            lines = file.readlines()
+            file.close()
+        except:
+            print("Error occurred while attempting to read file \"%s\":" % (path))
+            traceback.print_exc()
+            continue
 
         msg = "Processing file "+str(path_index+1)+" of "+str(len(paths))+": \""
         if len(msg)+len(path)+1<TERMINAL_WIDTH:

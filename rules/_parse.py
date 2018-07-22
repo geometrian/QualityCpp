@@ -1,8 +1,8 @@
 import itertools
 import re
 
-import _line
-import _strip_comments
+import rules._line as _line
+import rules._strip_comments as _strip_comments
 
 
 class CList(object):

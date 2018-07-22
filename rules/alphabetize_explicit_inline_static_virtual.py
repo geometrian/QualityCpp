@@ -1,7 +1,7 @@
 import re
 
-import _is_c_like
-import _parse
+import rules._is_c_like as _is_c_like
+import rules._parse as _parse
 
 
 #If a method is marked override, ensure it is marked virtual too.

@@ -2,9 +2,9 @@ import io
 import os
 import re
 
-import _debrace
-import _is_c_like
-import _parse
+import rules._debrace as _debrace
+import rules._is_c_like as _is_c_like
+import rules._parse as _parse
 
 
 #Attempts to find structs and classes that can be marked with the "final" C++ keyword;

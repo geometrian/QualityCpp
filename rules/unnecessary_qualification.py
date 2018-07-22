@@ -2,8 +2,8 @@ import io
 import os
 import re
 
-import _is_c_like
-import _strip_comments
+import rules._is_c_like as _is_c_like
+import rules._strip_comments as _strip_comments
 
 #Any unnecessarily qualified object instance is marked.  See
 #   http://stackoverflow.com/questions/29293136/compiler-warning-for-unnecessary-namespaces
