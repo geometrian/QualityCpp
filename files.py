@@ -6,7 +6,7 @@ import wx
 #Any path containing any of these strings is ignored
 _excludes_cont = [
     "3rdparty",
-    ".git", ".build", ".ides",
+    ".git", ".build", ".ides", "ide-msvc",
     "dirent-1.13",
     "CocoaWindow",
     "grub",
@@ -20,8 +20,8 @@ _excludes_cont = [
 #   Be used for other file types.
 _excludes_suff = [
     "asf",
-    "blend","blend1","obj","mtl","stl",
-    "bmp","g3","gif","jpg","pfm","png","ppm","tga","tif",
+    "blend","blend1","obj","mtl","ply","stl","vdb",
+    "bimg","bmp","g3","gif","jpg","pfm","png","ppm","tga","tif",
     "hdr","f32","f32z",
     "ipch",
     "py","pyc",

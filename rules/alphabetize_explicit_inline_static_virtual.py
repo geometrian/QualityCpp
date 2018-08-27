@@ -4,10 +4,10 @@ import rules._is_c_like as _is_c_like
 import rules._parse as _parse
 
 
-#If a method is marked override, ensure it is marked virtual too.
+#Ensure that keywords are in alphabetical order.
 
 class RuleAlphabetizeExplicitInlineStaticVirtual(object):
-    NAME = "Alphabetize \"explicit\"/\"inline\"/\"static\"/\"virtual\""
+    NAME = "Alphabetize `explicit`/`inline`/`static`/`virtual`"
 
     @staticmethod
     def get_description(line_numbers):

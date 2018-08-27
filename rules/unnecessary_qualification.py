@@ -9,7 +9,7 @@ import rules._strip_comments as _strip_comments
 #   http://stackoverflow.com/questions/29293136/compiler-warning-for-unnecessary-namespaces
 #   This is based on an extremely simple lexical analysis/preprocessing.  The following
 #   limitations apply:
-#       Makes no attempt to parse "#include"s or "#define"s.  As such, this does not catch
+#       Makes no attempt to parse `#include`s or `#define`s.  As such, this does not catch
 #           any issues related to macroed namespaces (and indeed, it may report false positives
 #           for such).
 #       Searches in all preprocessor branches (in a sane way, so e.g. this code, which has

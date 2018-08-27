@@ -48,7 +48,7 @@ class CFile(File):
                 self.lines.append(_line.Line(line.num,line.real,altered))
 
     #Return a CList; define a CList as a boolean expression and a list of items, with each item being either a
-    #   line of the file or a list of CLists.  The special conditional value "None" indicates an else block.
+    #   line of the file or a list of CLists.  The special conditional value `None` indicates an `else` block.
     #   Each list of CLists corresponds to a block of preprocessed options.  For example, if the file was:
     #       int a;
     #       #if FOO

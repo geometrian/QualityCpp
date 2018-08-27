@@ -4,7 +4,7 @@ import rules._is_c_like as _is_c_like
 import rules._parse as _parse
 
 
-#If a method is marked override, ensure it is marked virtual too.
+#If a method is marked `override`, ensure it is marked `virtual` too.
 
 class RuleVirtualOverride(object):
     NAME = "Virtual/Override"
@@ -13,7 +13,7 @@ class RuleVirtualOverride(object):
     def get_description(line_numbers):
         result = "Possible method"
         if len(line_numbers)>1: result+="s"
-        result += " tagged \"override\" but without \"virtual\" qualifier"
+        result += " tagged `override` but without `virtual` qualifier"
         if len(line_numbers)>1: result+="s"
         result += " on line"
         if len(line_numbers)>1: result+="s"

@@ -7,10 +7,10 @@ import rules._is_c_like as _is_c_like
 import rules._parse as _parse
 
 
-#Attempts to find structs and classes that can be marked with the "final" C++ keyword;
+#Attempts to find structs and classes that can be marked with the `final` C++ keyword;
 #   classes that are parents (or children, by my convention, even though it is
 #   unnecessary) should have a virtual destructor.  Classes that are not inheritable,
-#   including children, should have a final modifier.
+#   including children, should have a `final` modifier.
 
 class RuleFinalVirtual(object):
     NAME = "Final/Virtual Use"
@@ -18,9 +18,9 @@ class RuleFinalVirtual(object):
     @staticmethod
     def get_description(line_numbers):
         if len(line_numbers) == 1:
-            result = "Possible class with final/virtual mismatch begins definition on line"
+            result = "Possible class with `final`/`virtual` mismatch begins definition on line"
         else:
-            result = "Possible classes with final/virtual mismatch begin definitions on lines"
+            result = "Possible classes with `final`/`virtual` mismatch begin definitions on lines"
         return result
 
     @staticmethod
@@ -99,9 +99,9 @@ class RuleFinalVirtual(object):
 
                             bad = False
                             if maybe_parent == None: #not a child, but may be a parent
-                                #if a parent, then should have virtual but not have final.
+                                #if a parent, then should have `virtual` but not have `final`.
                                 if has_virt and not has_final: pass
-                                #otherwise, should not have virtual and should have final.
+                                #otherwise, should not have `virtual` and should have `final`.
                                 elif not has_virt and has_final: pass
                                 else: bad=True
                             else: #a child.  May be a parent

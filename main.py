@@ -47,13 +47,14 @@ def main():
         filename = os.path.basename(path)
 
         try:
-            file = open(path,"r")
+            file = open(path,"r",encoding="utf8")
             lines = file.readlines()
             file.close()
         except:
+            sys.stdout.write("\n")
             print("Error occurred while attempting to read file \"%s\":" % (path))
             traceback.print_exc()
-            continue
+            input()
 
         msg = "Processing file "+str(path_index+1)+" of "+str(len(paths))+": \""
         if len(msg)+len(path)+1<TERMINAL_WIDTH:

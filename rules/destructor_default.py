@@ -4,14 +4,14 @@ import rules._is_c_like as _is_c_like
 import rules._parse as _parse
 
 
-#Flags empty destructor bodies, which should be "default"ed.
+#Flags empty destructor bodies, which should be `default`ed.
 
 class RuleDestructorDefault(object):
-    NAME = "Destructor \"default\""
+    NAME = "Destructor `default`"
 
     @staticmethod
     def get_description(line_numbers):
-        result = "Possible application of \"default\" for destructor on line"
+        result = "Possible application of `default` for destructor on line"
         if len(line_numbers)>1: result+="s"
         return result
 
