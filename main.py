@@ -14,6 +14,7 @@ import rules.leading_space
 import rules.trailing_whitespace
 import rules.unnecessary_qualification
 import rules.virtual_override
+import rules.void_argument
 rules = [
     #Comment out any here that you don't want.
     rules.alphabetize_explicit_inline_static_virtual.RuleAlphabetizeExplicitInlineStaticVirtual,
@@ -24,7 +25,8 @@ rules = [
     rules.leading_space.RuleLeadingSpace,
     rules.trailing_whitespace.RuleTrailingWhitespace,
     rules.unnecessary_qualification.RuleUnnecessaryQualification,
-    rules.virtual_override.RuleVirtualOverride
+    rules.virtual_override.RuleVirtualOverride,
+    rules.void_argument.RuleVoidArgument
 ]
 
 #Configuration
